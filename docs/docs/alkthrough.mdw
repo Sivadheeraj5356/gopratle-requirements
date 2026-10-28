@@ -1,0 +1,26 @@
+# Six-minute walkthrough and interview preparation
+
+Review aid, not applicant testimony. Use your own words and only claim decisions you understand.
+
+0:00-0:40: Explain the brief: four steps, shared event basics, three category branches, backend persistence. Exact branch questions were not specified, so identify the documented assumptions.
+
+0:40-1:50: Show planner flow from basics to review. Change fields, go back, and show draft recovery on refresh. Explain why switching categories clears old details. Demonstrate performer and crew branches.
+
+1:50-2:40: Submit a synthetic crew brief. Show the POST payload and response. Explain that success is displayed only after the server save succeeds, not when Continue is pressed.
+
+2:40-3:40: Open backend/src/schema.js and backend/src/app.js. Explain strict common fields, selected category schema, impossible dates and numeric bounds. Show MongoDB document with category, nested details, creation time and status. Explain category index and why no public listing endpoint exists.
+
+3:40-4:40: Explain idempotency: UUID per draft, unique database index, normalized payload hash, duplicate-key race handling. A repeated request returns the original receipt; changed payload with the same key conflicts. Server secrets never reach browser code.
+
+4:40-5:30: Run npm test. Discuss three real Mongo saves, concurrent retries, wrong-category fields, malformed JSON, large body, reversed dates, zero counts, negative budgets and privacy of returned receipts. Show UI backend failure leaving the form intact.
+
+5:30-6:00: State limitations honestly: anonymous demo, no marketplace matching, no user auth, no distributed rate limiter. Current review uses a real temporary local mongod; durable deployment remains a separate step. Priorities: production abuse controls, owner authentication for future read endpoints, persistence/retention policy, monitoring and hosted smoke tests.
+
+## Questions to be ready for
+
+- Why separate Next.js and Express instead of only Next API routes? The assignment explicitly requests both; the separation also isolates validation and persistence from presentation.
+- Why one collection rather than three? Shared metadata plus a category discriminator makes filtering simple; strict category-specific validation prevents mixed fields.
+- How does a duplicate click avoid duplicate records? Client busy guard plus server-side unique idempotency index and race handling.
+- What happens if MongoDB is down? No success receipt; server returns an unavailable error, client keeps the draft.
+- Why sessionStorage? Recovery within the same tab without pretending local drafts are a backend save; tab closure clears the session.
+- What are the security limits? No retrieval endpoint or contact collection, but anonymous writes still need abuse protection before broad public use.
